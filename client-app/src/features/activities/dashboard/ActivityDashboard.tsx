@@ -8,7 +8,7 @@ import { ActivityList } from "./ActivityList";
 
 export const ActivityDashboard: React.FC = observer(() => {
   const activityStore = useContext(ActivityStore);
-  const { editMode, selectedActivity } = activityStore;
+  const { editMode, activity: selectedActivity } = activityStore;
 
   return (
     <Grid>
@@ -16,13 +16,7 @@ export const ActivityDashboard: React.FC = observer(() => {
         <ActivityList />
       </Grid.Column>
       <GridColumn width={6}>
-        {selectedActivity && !editMode && <ActivityDetails />}
-        {editMode && (
-          <ActivityForm
-            key={selectedActivity?.id ?? 0}
-            activity={selectedActivity}
-          />
-        )}
+        <h2>Activity Filters</h2>
       </GridColumn>
     </Grid>
   );

@@ -8,7 +8,7 @@ configure({ enforceActions: "always" });
 class ActivityStore {
   activities: IActivity[] = [];
   loadingInitial = false;
-  selectedActivity: IActivity | undefined = undefined;
+  activity: IActivity | undefined = undefined;
   editMode = false;
   submitting = false;
   activityRegistry: Map<string, IActivity> = new Map();
@@ -43,6 +43,35 @@ class ActivityStore {
     }
   };
 
+  private getActivity = (id: string) => {
+    return this.activityRegistry.get(id);
+  };
+
+  loadActivity = async (id: string) => {
+    let activity = this.getActivity(id);
+    if (activity) {
+      runInAction(() => {
+        this.activity = activity;
+      });
+    } else {
+      this.loadingInitial = true;
+      try {
+        activity = await agent.Activities.details(id);
+        runInAction(() => {
+          this.activity = activity;
+          this.loadingInitial = false;
+        });
+      } catch (error) {
+        console.log(error);
+        runInAction(() => {
+          this.loadingInitial = false;
+        });
+      }
+    }
+  };
+
+  clearActivity = () => (this.activity = undefined);
+
   createActivity = async (activity: IActivity) => {
     this.submitting = true;
     try {
@@ -67,7 +96,7 @@ class ActivityStore {
       await agent.Activities.update(activity);
       runInAction(() => {
         this.activityRegistry.set(activity.id, activity);
-        this.selectedActivity = activity;
+        this.activity = activity;
         this.editMode = false;
         this.submitting = false;
       });
@@ -101,14 +130,14 @@ class ActivityStore {
   openCreateForm = () => {
     runInAction(() => {
       this.editMode = true;
-      this.selectedActivity = undefined;
+      this.activity = undefined;
     });
   };
 
   openEditForm = (id: string) => {
     runInAction(() => {
       this.editMode = true;
-      this.selectedActivity = this.activityRegistry.get(id);
+      this.activity = this.activityRegistry.get(id);
     });
   };
 
@@ -120,13 +149,13 @@ class ActivityStore {
 
   cancelSelectedActivity = () => {
     runInAction(() => {
-      this.selectedActivity = undefined;
+      this.activity = undefined;
     });
   };
 
   selectActivity = (id: string) => {
     runInAction(() => {
-      this.selectedActivity = this.activityRegistry.get(id);
+      this.activity = this.activityRegistry.get(id);
     });
   };
 }

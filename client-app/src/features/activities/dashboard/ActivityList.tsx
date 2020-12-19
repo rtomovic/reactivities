@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import React, { useContext } from "react";
+import { Link } from "react-router-dom";
 import { Button, Item, Label, Segment } from "semantic-ui-react";
 import ActivityStore from "../../../app/stores/activityStore";
 
@@ -29,7 +30,8 @@ export const ActivityList: React.FC = observer(() => {
                   floated="right"
                   content="View"
                   color="blue"
-                  onClick={() => selectActivity(activity.id)}
+                  as={Link}
+                  to={`/activities/${activity.id}`}
                 />
                 <Button
                   name={activity.id}
